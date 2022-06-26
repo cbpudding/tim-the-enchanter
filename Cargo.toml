@@ -1,0 +1,19 @@
+[package]
+name = "tim-the-enchanter"
+version = "0.1.0"
+authors = ["Alexander Hill <ahill@breadpudding.dev>"]
+edition = "2021"
+description = "A Discord bot written in Rust for automated server management"
+homepage = "https://discord.gg/7ZVbxXT"
+repository = "https://github.com/cbpudding/tim-the-enchanter"
+license = "MIT"
+publish = false
+
+[dependencies]
+futures = "0.3.21"
+tokio = { version = "1.19.2", features = ["macros", "rt-multi-thread"] }
+twilight-cache-inmemory = "0.11.0"
+twilight-gateway = "0.11.0"
+twilight-http = "0.11.0"
+twilight-interactions = "0.11.0"
+twilight-model = "0.11.0"
