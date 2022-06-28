@@ -1,4 +1,5 @@
 #![allow(clippy::unreadable_literal)]
+#![feature(box_patterns)]
 
 use futures::{stream::StreamExt, TryFutureExt};
 use interactions::TimInteraction;
@@ -8,10 +9,11 @@ use twilight_gateway::{
     cluster::{Cluster, ShardScheme},
     Event, Intents,
 };
-use twilight_http::{Client as HttpClient};
+use twilight_http::{request::AuditLogReason, Client as HttpClient};
 use twilight_model::{
-    application::{interaction::Interaction},
-    gateway::payload::incoming::InteractionCreate,
+    application::interaction::Interaction,
+    channel::{Reaction, ReactionType},
+    gateway::payload::incoming::{InteractionCreate, ReactionAdd},
     id::{
         marker::{ApplicationMarker, GuildMarker},
         Id,
@@ -37,6 +39,23 @@ async fn handle_interaction(
     Ok(())
 }
 
+async fn handle_reaction(
+    reaction: Reaction,
+    http: Arc<HttpClient>,
+) -> Result<(), Box<dyn Error + Send + Sync>> {
+    if reaction.message_id == Id::new(991122072883429396) {
+        if let ReactionType::Custom { id, .. } = reaction.emoji {
+            if id == Id::new(746465402959429672) {
+                http.add_guild_member_role(TW, reaction.user_id, Id::new(991122401284870224))
+                    .reason("Passed server verification")?
+                    .exec()
+                    .await?;
+            }
+        }
+    }
+    Ok(())
+}
+
 #[allow(clippy::single_match)]
 async fn handle_event(
     _shard_id: u64,
@@ -47,6 +66,7 @@ async fn handle_event(
         Event::InteractionCreate(InteractionCreate(interaction)) => {
             handle_interaction(interaction, http).await
         }
+        Event::ReactionAdd(box ReactionAdd(reaction)) => handle_reaction(reaction, http).await,
         _ => Ok(()),
     }
 }
@@ -62,7 +82,8 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
         total: 1,
     };
     // Specify gateway intents
-    let intents = Intents::GUILD_MESSAGES | Intents::DIRECT_MESSAGES;
+    let intents =
+        Intents::GUILD_MESSAGES | Intents::DIRECT_MESSAGES | Intents::GUILD_MESSAGE_REACTIONS;
     // Build and start the cluster
     let (cluster, mut events) = Cluster::builder(token.clone(), intents)
         .shard_scheme(scheme)

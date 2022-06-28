@@ -14,7 +14,7 @@ pub fn get_commands() -> [ApplicationCommandData; 1] {
 
 mod interaction_prelude {
     pub use async_trait::async_trait;
-    pub use twilight_http::{Client as HttpClient};
+    pub use twilight_http::Client as HttpClient;
     pub use twilight_interactions::command::{CommandModel, CreateCommand};
     pub use twilight_model::{
         application::interaction::{ApplicationCommand, Interaction},
@@ -22,7 +22,7 @@ mod interaction_prelude {
     };
     pub use twilight_util::builder::InteractionResponseDataBuilder;
 
-    pub (super) use crate::{TIM, TW};
+    pub(super) use crate::{TIM, TW};
 }
 
 #[async_trait]
