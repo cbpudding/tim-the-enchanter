@@ -1,5 +1,6 @@
 #![allow(clippy::unreadable_literal)]
 #![feature(box_patterns)]
+#![feature(unchecked_math)]
 
 use futures::{stream::StreamExt, TryFutureExt};
 use interactions::TimInteraction;
@@ -23,6 +24,7 @@ use twilight_model::{
 const TIM: Id<ApplicationMarker> = Id::new(990443765468631081);
 const TW: Id<GuildMarker> = Id::new(565884670424645652);
 
+mod bf;
 mod interactions;
 
 #[allow(clippy::single_match)]
@@ -32,6 +34,7 @@ async fn handle_interaction(
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
     if let Interaction::ApplicationCommand(command) = interaction.clone() {
         match command.data.name.as_str() {
+            "bf" => interactions::BfCommand::exec(interaction, command, http).await?,
             "role" => interactions::RoleCommand::exec(interaction, command, http).await?,
             _ => (),
         }

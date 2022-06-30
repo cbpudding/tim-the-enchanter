@@ -5,7 +5,10 @@ use twilight_http::Client as HttpClient;
 use twilight_interactions::command::{ApplicationCommandData, CreateCommand};
 use twilight_model::application::interaction::{ApplicationCommand, Interaction};
 
+mod bf;
 mod role;
+
+pub use bf::Command as BfCommand;
 pub use role::Command as RoleCommand;
 
 pub fn get_commands() -> [ApplicationCommandData; 1] {
