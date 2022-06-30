@@ -44,7 +44,7 @@ impl Interpreter {
             self.tick();
             lcv += 1;
         }
-        if self.counter < self.code.len() {
+        if lcv < len {
             Ok(self.output())
         } else {
             Err(InterpreterError::TickLimitReached)

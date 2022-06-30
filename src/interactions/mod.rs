@@ -11,8 +11,11 @@ mod role;
 pub use bf::Command as BfCommand;
 pub use role::Command as RoleCommand;
 
-pub fn get_commands() -> [ApplicationCommandData; 1] {
-    [RoleCommand::create_command()]
+pub fn get_commands() -> [ApplicationCommandData; 2] {
+    [
+        BfCommand::create_command(),
+        RoleCommand::create_command()
+    ]
 }
 
 mod interaction_prelude {

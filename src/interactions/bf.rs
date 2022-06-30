@@ -22,7 +22,7 @@ impl TimInteraction for Command {
     ) -> Result<(), Box<dyn Error + Send + Sync>> {
         let ia_http = http.interaction(TIM);
         let request = Self::from_interaction(command.data.into())?;
-        match Interpreter::try_from(request.src) {
+        match Interpreter::try_from(request.src.clone()) {
             Ok(mut interpreter) => match interpreter.run(8192) {
                 Ok(output) => {
                     ia_http
@@ -33,7 +33,7 @@ impl TimInteraction for Command {
                                 kind: InteractionResponseType::ChannelMessageWithSource,
                                 data: Some(
                                     InteractionResponseDataBuilder::new()
-                                        .content(format!("Program output: ```\n{}\n```", output))
+                                        .content(format!("Source: ```Brainfuck\n{}\n``` Program output: ```\n{}\n```", request.src, output))
                                         .build()
                                 )
                             }
@@ -50,7 +50,7 @@ impl TimInteraction for Command {
                                 kind: InteractionResponseType::ChannelMessageWithSource,
                                 data: Some(
                                     InteractionResponseDataBuilder::new()
-                                        .content(format!("Runtime error: {:?}", e))
+                                        .content(format!("Source: ```Brainfuck\n{}\n``` Runtime error: {:?}", request.src, e))
                                         .build()
                                 )
                             }
@@ -68,7 +68,7 @@ impl TimInteraction for Command {
                             kind: InteractionResponseType::ChannelMessageWithSource,
                             data: Some(
                                 InteractionResponseDataBuilder::new()
-                                    .content(format!("Compile error: {:?}", e))
+                                    .content(format!("Source: ```Brainfuck\n{}\n``` Compile error: {:?}", request.src, e))
                                     .build()
                             )
                         }
