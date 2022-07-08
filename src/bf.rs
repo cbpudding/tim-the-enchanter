@@ -5,13 +5,13 @@ pub struct Interpreter {
     counter: usize,
     memory: [u8; 256],
     output: Vec<char>,
-    pointer: u8
+    pointer: u8,
 }
 
 #[derive(Debug)]
 pub enum InterpreterError {
     UnbalancedBrackets,
-    TickLimitReached
+    TickLimitReached,
 }
 
 impl fmt::Display for InterpreterError {
@@ -23,14 +23,14 @@ impl fmt::Display for InterpreterError {
 impl Error for InterpreterError {}
 
 enum Symbol {
-    Right, // >
-    Left, // <
-    Increment, // +
-    Decrement, // -
-    Output, // .
-    Input, // ,
-    BranchZero(usize), // [
-    BranchNonzero(usize) // ]
+    Right,                // >
+    Left,                 // <
+    Increment,            // +
+    Decrement,            // -
+    Output,               // .
+    Input,                // ,
+    BranchZero(usize),    // [
+    BranchNonzero(usize), // ]
 }
 
 impl Interpreter {
@@ -56,15 +56,25 @@ impl Interpreter {
             match self.code[self.counter] {
                 Symbol::Right => unsafe { self.pointer = self.pointer.unchecked_add(1) },
                 Symbol::Left => unsafe { self.pointer = self.pointer.unchecked_sub(1) },
-                Symbol::Increment => unsafe { self.memory[self.pointer as usize] = self.memory[self.pointer as usize].unchecked_add(1) },
-                Symbol::Decrement => unsafe { self.memory[self.pointer as usize] = self.memory[self.pointer as usize].unchecked_sub(1) },
+                Symbol::Increment => unsafe {
+                    self.memory[self.pointer as usize] =
+                        self.memory[self.pointer as usize].unchecked_add(1)
+                },
+                Symbol::Decrement => unsafe {
+                    self.memory[self.pointer as usize] =
+                        self.memory[self.pointer as usize].unchecked_sub(1)
+                },
                 Symbol::Output => self.output.push(self.memory[self.pointer as usize] as char),
                 Symbol::Input => self.memory[self.pointer as usize] = 0,
-                Symbol::BranchZero(branch) => if self.memory[self.pointer as usize] == 0 {
-                    self.counter = branch;
-                },
-                Symbol::BranchNonzero(branch) => if self.memory[self.pointer as usize] != 0 {
-                    self.counter = branch;
+                Symbol::BranchZero(branch) => {
+                    if self.memory[self.pointer as usize] == 0 {
+                        self.counter = branch;
+                    }
+                }
+                Symbol::BranchNonzero(branch) => {
+                    if self.memory[self.pointer as usize] != 0 {
+                        self.counter = branch;
+                    }
                 }
             }
             self.counter += 1;
@@ -101,7 +111,7 @@ impl TryFrom<String> for Interpreter {
                 _ => {}
             }
         }
-        if stack.len() > 0 {
+        if !stack.is_empty() {
             return Err(InterpreterError::UnbalancedBrackets);
         }
         Ok(Self {
@@ -109,7 +119,7 @@ impl TryFrom<String> for Interpreter {
             counter: 0,
             memory: [0; 256],
             output: Vec::new(),
-            pointer: 0
+            pointer: 0,
         })
     }
 }
