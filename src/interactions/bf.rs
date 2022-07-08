@@ -10,7 +10,7 @@ use super::TimInteraction;
 #[command(name = "bf", desc = "Compiles and executes Brainfuck code")]
 pub struct Command {
     /// The source code to be compiled and executed
-    src: String
+    src: String,
 }
 
 #[async_trait]
@@ -18,7 +18,7 @@ impl TimInteraction for Command {
     async fn exec(
         interaction: Interaction,
         command: Box<ApplicationCommand>,
-        http: Arc<HttpClient>
+        http: Arc<HttpClient>,
     ) -> Result<(), Box<dyn Error + Send + Sync>> {
         let ia_http = http.interaction(TIM);
         let request = Self::from_interaction(command.data.into())?;
@@ -40,7 +40,7 @@ impl TimInteraction for Command {
                         )
                         .exec()
                         .await?;
-                },
+                }
                 Err(e) => {
                     ia_http
                         .create_response(
@@ -50,10 +50,13 @@ impl TimInteraction for Command {
                                 kind: InteractionResponseType::ChannelMessageWithSource,
                                 data: Some(
                                     InteractionResponseDataBuilder::new()
-                                        .content(format!("Source: ```Brainfuck\n{}\n``` Runtime error: {:?}", request.src, e))
-                                        .build()
-                                )
-                            }
+                                        .content(format!(
+                                            "Source: ```Brainfuck\n{}\n``` Runtime error: {:?}",
+                                            request.src, e
+                                        ))
+                                        .build(),
+                                ),
+                            },
                         )
                         .exec()
                         .await?;
@@ -68,10 +71,13 @@ impl TimInteraction for Command {
                             kind: InteractionResponseType::ChannelMessageWithSource,
                             data: Some(
                                 InteractionResponseDataBuilder::new()
-                                    .content(format!("Source: ```Brainfuck\n{}\n``` Compile error: {:?}", request.src, e))
-                                    .build()
-                            )
-                        }
+                                    .content(format!(
+                                        "Source: ```Brainfuck\n{}\n``` Compile error: {:?}",
+                                        request.src, e
+                                    ))
+                                    .build(),
+                            ),
+                        },
                     )
                     .exec()
                     .await?;
